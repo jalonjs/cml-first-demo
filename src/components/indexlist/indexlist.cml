@@ -1,0 +1,203 @@
+<template>
+<view class="page-wrapper">
+  <scroller
+    height="{{-1}}"
+    class="index-list-wrapper"
+    scroll-top="{{offsetTop}}"
+    c-bind:onscroll="handleScroll"
+  >
+    <view
+      c-for="{{list}}"
+      c-for-item="listitem"
+      c-key="{{listitem.name}}"
+      class="index-list-item"
+    >
+      <view class="index-list-item-name" style="{{compItemNameHeight}}">
+        <text class="index-list-item-name-text">{{listitem.name}}</text>
+      </view>
+      <view 
+        c-for="{{listitem.items}}" 
+        c-for-item="subitem"
+        c-key="{{subitem.name}}"
+        class="index-list-item-content"
+        style="{{compItemContentHeight}}"
+        c-bind:tap="handleSelect(subitem)"
+      >
+        <text class="index-list-item-content-text"> {{subitem.name}}</text>
+      </view>
+    </view>
+  </scroller>
+  <view 
+    class="short-cut-wrapper" 
+    style="{{compScwStyle}}"
+  >
+    <view 
+      c-for="{{shortcut}}"
+      c-key="*this"
+      class="short-cut-item"
+      c-bind:tap="scrollToItem(item)"
+    >
+      <text class="short-cut-item-text" style="{{activeIndex === index ? 'color:orange' : ''}}">{{item}}</text>
+    </view>
+  </view>
+</view>
+</template>
+<script>
+import cml from 'chameleon-api';
+
+// 默认高度
+const DEFAULT_ITEM_NAME_HEIGHT = 90;
+const DEFAULT_ITEM_CONTENT_HEIGHT = 100;
+
+class IndexList {
+  props = {
+    dataList: {
+      type: Array,
+      default: []
+    }
+  }
+
+  data = {
+    list:[],
+    shortcut: [],
+    viewportHeight: 0,
+    offsetTop: 0,
+    activeIndex: 0,
+    itemContentHeight: DEFAULT_ITEM_CONTENT_HEIGHT,
+    itemNameHeight: DEFAULT_ITEM_NAME_HEIGHT
+  }
+
+  computed = {
+    compScwStyle() {
+      return `top:${this.viewportHeight / 2}cpx`
+    },
+    compItemNameHeight() {
+      return `height:${this.itemNameHeight}cpx`
+    },
+    compItemContentHeight() {
+      return `height:${this.itemContentHeight}cpx`
+    }
+  }
+  methods = {
+
+    async getViewportHeight() {
+      let res = await cml.getSystemInfo();
+      this.viewportHeight = res.viewportHeight;
+    },
+
+    initData() {
+      // get shortcut
+      this.dataList.forEach(item => {
+        if (item.pinYin) {
+          let firstName = item.pinYin.substring(0, 1);
+          if (item.pinYin && this.shortcut.indexOf(firstName.toUpperCase()) === -1) {
+            this.shortcut.push(firstName.toUpperCase());
+          };
+        };
+      });  
+
+      // handle input data
+      const cityData = this.shortcut.map(item => ({items:[], name: item}));
+      this.dataList.forEach((item) => {
+        let firstName = item.pinYin.substring(0, 1).toUpperCase();
+        let index = this.shortcut.indexOf(firstName);
+        cityData[index].items.push(item);
+      });
+      
+      // calculate offsetTop
+      cityData.forEach((item, index) => {
+        let arr = cityData.slice(0, index);
+        item.totalHeight = this.itemNameHeight + item.items.length * this.itemContentHeight;
+        item.offsetTop = arr.reduce((total, cur) => (total + this.itemNameHeight + cur.items.length * this.itemContentHeight), 0);
+      });
+      this.list = cityData;
+    },
+
+    scrollToItem(shortcut) {
+      let { offsetTop } = this.list.find(item => item.name === shortcut);
+      this.offsetTop = offsetTop;
+    },
+
+    handleScroll(e) {
+      let { scrollTop } = e.detail;
+      scrollTop = Math.ceil(scrollTop);
+      this.activeIndex = this.list.findIndex(item => scrollTop >= item.offsetTop && scrollTop < item.totalHeight + item.offsetTop )
+    },
+
+    handleSelect(e) {
+      this.$cmlEmit('onselect', e)
+    }
+  }
+
+  mounted() {
+    this.initData();
+    this.getViewportHeight();
+  }
+}
+export default new IndexList();
+</script>
+<style scope lang='less'>
+.page-wrapper {
+  display: flex;
+  position: relative;
+  width: 750cpx;
+}
+.index-list {
+  &-item {
+    width: 750cpx;
+    &-name {
+      display: flex;
+      flex-direction: column;
+      padding-left: 50cpx;
+      background: #f7f7f7;
+      justify-content: center;
+      &-text {
+        font-size: 28cpx;
+        color: #999;
+      }
+    }
+    &-content {
+      display: flex;
+      flex-direction: column;
+      padding-left: 40cpx;
+      justify-content: center;
+      &-text {
+        font-size: 28cpx;
+        color: gray;
+      }
+    }
+  }
+}
+
+.short-cut {
+  &-wrapper {
+    position: absolute;
+    right: 30cpx;
+    z-index: 99;
+    transform: translateY(-50%)
+  }
+  &-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15cpx;
+    width: 35cpx;
+    height: 35cpx;
+    background: #edf0f4;
+    border-radius: 35cpx;
+    &-text {
+      font-size: 28cpx;
+      color: #666
+    }
+  }
+
+}
+</style>
+<script cml-type="json">
+{
+  "base": {
+    "usingComponents": {}
+  }
+}
+</script>

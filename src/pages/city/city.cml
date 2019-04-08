@@ -1,0 +1,56 @@
+<template>
+  <view class="page-wrapper">
+    <indexlist
+      dataList="{{dataList}}"
+      c-bind:onselect="onItemSelect"
+    ></indexlist>
+  </view>
+</template>
+
+<script>
+import cml from 'chameleon-api';
+import store from "../../store";
+import { CITY_CHANGE } from '../../store/mutation-types.js';
+import { dataList } from '../../constant/index';
+
+class Index  {
+  data = {
+    dataList
+  }
+  methods = {
+    ...store.mapMutations([
+      CITY_CHANGE
+    ]),
+    onItemSelect(e) {
+      this[CITY_CHANGE](e.detail.name);
+      cml.navigateBack();
+    }
+  }
+}
+
+export default new Index();
+
+</script>
+<style>
+
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+</style>
+<script cml-type="json">
+{
+  "base": {
+    "usingComponents": {
+      "indexlist":"/components/indexlist/indexlist"
+    }
+  },
+  "wx": {
+    "navigationBarTitleText": "index",
+    "backgroundTextStyle": "dark",
+    "backgroundColor": "#E2E2E2"
+  }
+}
+</script>

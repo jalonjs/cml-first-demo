@@ -1,0 +1,73 @@
+<template>
+  <view class="about">
+    <view class="about-content">
+      <text>I am Chameleon!</text>
+      <image class="about-logo" src="{{logo}}"></image>
+    </view>
+  </view>
+</template>
+
+<script>
+
+class About {
+
+  data = {
+    logo: require('../../assets/images/chameleon.png')
+  }
+
+  computed = {
+  }
+
+  watch  = {
+  }
+
+  methods = {
+  }
+
+  beforeCreate() {
+  }
+
+  created() {
+  }
+
+  beforeMount() {
+  }
+
+  mounted() {
+  }
+
+  beforeDestroy() {
+  }
+
+  destroyed() {
+  }
+}
+
+export default new About();
+</script>
+<style>
+.about {
+  height: 900cpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.about-content {
+  height: 180cpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+.about-logo {
+  width: 80cpx;
+  height: 80cpx;
+}
+</style>
+<script cml-type="json">
+{
+  "base": {
+    "usingComponents": {}
+  }
+}
+</script>

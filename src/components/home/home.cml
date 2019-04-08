@@ -1,0 +1,91 @@
+<template>
+  <view class="home">
+    <view class="home-content">
+      <view class="home-content-btn-wrapper">
+        <button
+            type="blue"
+            size="medium"
+            text="选择城市"
+            c-bind:onclick="selectCity"
+          >
+          </button>
+      </view>
+      <view class="home-content-text-wrapper">
+        <text>你选择的城市为：{{ city }}</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import cml from 'chameleon-api';
+import store from "../../store";
+
+class Home {
+  data = {
+  }
+
+  computed = store.mapState({
+    city: state => state.city,
+  })
+
+  watch  = {
+  }
+
+  methods = {
+    selectCity() {
+      cml.navigateTo({
+        path: '/pages/city/city'
+      })
+    }
+  }
+
+  beforeCreate() {
+  }
+
+  created() {
+  }
+
+  beforeMount() {
+  }
+
+  mounted() {
+  }
+
+  beforeDestroy() {
+  }
+
+  destroyed() {
+  }
+}
+
+export default new Home();
+</script>
+<style>
+.home {
+  height: 900cpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.home-content {
+  height: 140cpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+.home-content-btn-wrapper {
+  flex: 1;
+}
+.home-content-text-wrapper {
+  height: 40cpx;
+}
+</style>
+<script cml-type="json">
+{
+  "base": {
+    "usingComponents": {}
+  }
+}
+</script>
